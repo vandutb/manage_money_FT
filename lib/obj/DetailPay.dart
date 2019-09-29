@@ -1,5 +1,14 @@
 
 class DetailPay{
-  String id, name, description, createDate;
-  double cost;
+  String ID,
+      NAME,
+      ID_MANAGE,
+      IMAGE,
+      DESCRIPTION,
+      COST,
+      WAS_PAY ,
+      SCHEDULE_COST,
+      FORCUS,
+      CREATE_DATE,
+      UPDATE_DATE;
 }

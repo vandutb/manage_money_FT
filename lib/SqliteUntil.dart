@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:async' as prefix0;
 
+import 'package:managemoneybyday_ft/obj/DetailPay.dart';
 import 'package:managemoneybyday_ft/obj/MoneyManage.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -29,12 +30,12 @@ class  SqliteUntil {
   //dã trả tiền hay chưa
   //dùng cho chức năng lên lịch
   static final CL_WAS_PAY  = "IS_WAS_PAYMENT";
-  static final CL_DAY_COST = "DAY_COST";
+  static final SCHEDULE = "DAY_COST";
 
   //column TOPIC
   static final CL_NAME_TOPIC = "TOPIC_NAME";
   // theo dõi mục này
-  static final CL_FORCUS = "IS_FORCUS";
+  static final CL_IS_FORCUS = "IS_FORCUS";
 
 
   //
@@ -61,9 +62,9 @@ class  SqliteUntil {
         "$CL_IMAGE TEXT NULL,"
         "$CL_DESCRIPTION TEXT NULL,"
         "$CL_COST DOUBLE NULL,"
-        "$CREATE_DATE DATETIME NOT NULL,"
-        "$UPDATE_DATE DATETIME NOT NULL,"
-        "$CL_DAY_COST DATETIME NOT NULL,"
+        "$CREATE_DATE default CURRENT_DATE,"
+        "$UPDATE_DATE default CURRENT_DATE,"
+        "$SCHEDULE DATETIME NOT NULL,"
         "$CL_WAS_PAY BOOLEAN NULL"
         ")'"
     ;
@@ -73,26 +74,54 @@ class  SqliteUntil {
         "$CL_NAME TEXT NOT NULL,"
         "$CL_IMAGE TEXT NOT NULL,"
         "$CL_DESCRIPTION TEXT NOT NULL,"
-        "$CL_FORCUS BOOLEAN NOT NULL,"
-        "$CREATE_DATE DATETIME NOT NULL,"
-        "$UPDATE_DATE DATETIME NOT NULL"
+        "$CL_IS_FORCUS BOOLEAN NOT NULL,"
+        "$CREATE_DATE DATETIME default CURRENT_DATE,"
+        "$UPDATE_DATE DATETIME default CURRENT_DATE"
         ")'"
     ;
   }
 
-  addTopic()async{
-    await _db.transaction((db) async{
-        db.rawInsert("'INSERT INTO $TB_MONEY_TOPIC("
+  Future<bool> addTopic(MoneyManage moneyManage)async{
+    var state = await _db.transaction((db) async{
+        db.rawInsert("INSERT INTO $TB_MONEY_TOPIC("
             "$CL_NAME, "
             "$CL_IMAGE, "
             "$CL_DESCRIPTION, "
-            "$CL_FORCUS, "
-            "$CREATE_DATE, "
-            "$UPDATE_DATE) "
-            "VALUES ()"
-            ")'");
+            "$CL_IS_FORCUS) "
+            "VALUES ("
+            "'${moneyManage.CL_NAME}', "
+            "'${moneyManage.CL_IMAGE}', "
+            "'${moneyManage.CL_DESCRIPTION}', "
+            "'${moneyManage.CL_IS_FORCUS}'"
+            ")");
     });
+    return state != "-1";
   }
+
+  Future<bool> addDetail(DetailPay detailPay)async{
+    var state = await _db.transaction((db) async{
+        db.rawInsert("INSERT INTO $TB_MONEY_DETAIL("
+            "$CL_ID_MANAGE , "
+            "$CL_NAME , "
+            "$CL_IMAGE , "
+            "$CL_DESCRIPTION, "
+            "$CL_COST, "
+            "$SCHEDULE, "
+            "$CL_WAS_PAY ) "
+            "VALUES ("
+            "'${detailPay.ID_MANAGE}', "
+            "'${detailPay.NAME}', "
+            "'${detailPay.IMAGE}', "
+            "'${detailPay.DESCRIPTION}', "
+            "'${detailPay.COST}', "
+            "'${detailPay.SCHEDULE_COST}', "
+            "'${detailPay.WAS_PAY}' "
+            ")");
+    });
+    return state != "-1";
+  }
+
+
 
   Future<List<MoneyManage>> getLstManage(Database db) async{
     var lstMoney =  List<MoneyManage>();
